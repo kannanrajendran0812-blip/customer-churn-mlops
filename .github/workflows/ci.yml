@@ -76,6 +76,29 @@ jobs:
           print("Model type:", type(model))
           PY
 
+      - name: Verify repository and model
+        shell: bash
+        run: |
+          set -eux
+
+          echo "=== Git commit ==="
+          git rev-parse HEAD
+
+          echo "=== Model in Git ==="
+          git ls-tree -l HEAD models/best_model.joblib
+
+          echo "=== Models directory ==="
+          ls -lah models
+
+          echo "=== Model file ==="
+          ls -lah models/best_model.joblib
+
+          echo "=== Model size ==="
+          wc -c models/best_model.joblib
+
+          test -f models/best_model.joblib
+          test -s models/best_model.joblib
+
       - name: Run tests
         shell: bash
         run: |
