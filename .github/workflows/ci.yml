@@ -29,10 +29,35 @@ jobs:
 
       - name: Check model file
         run: |
+          echo "=== COMMIT ==="
           git rev-parse HEAD
-          ls -la models
-          test -f models/best_model.joblib
-          
+
+          echo "=== WORKING DIRECTORY ==="
+          pwd
+
+          echo "=== REPOSITORY ROOT ==="
+          ls -la
+
+          echo "=== MODELS DIRECTORY ==="
+          if [ -d models ]; then
+            ls -lah models
+          else
+            echo "ERROR: models directory does not exist"
+            exit 1
+          fi
+
+          echo "=== GIT TRACKED MODEL ==="
+          git ls-files -s models/best_model.joblib
+
+          echo "=== MODEL FILE CHECK ==="
+          if [ -f models/best_model.joblib ]; then
+            echo "MODEL EXISTS"
+            ls -lh models/best_model.joblib
+          else
+            echo "ERROR: MODEL DOES NOT EXIST"
+            exit 1
+          fi
+
       - name: Run tests
         run: |
           pytest -v
