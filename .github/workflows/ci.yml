@@ -15,50 +15,69 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"
+
+      - name: Verify repository and model
+        shell: bash
+        run: |
+          set -eux
+
+          echo "=== Git commit ==="
+          git rev-parse HEAD
+
+          echo "=== Git status ==="
+          git status --short
+
+          echo "=== Model in Git ==="
+          git ls-tree -l HEAD models/best_model.joblib
+
+          echo "=== Model file ==="
+          ls -lah models/best_model.joblib
+
+          echo "=== Model size ==="
+          wc -c models/best_model.joblib
+
+          echo "=== Test file ==="
+          ls -lah tests/test_api.py
+
+          test -f models/best_model.joblib
+          test -s models/best_model.joblib
 
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install httpx2
+          pip install httpx
 
-      - name: Check model file
+      - name: Verify Python model loading
+        shell: bash
         run: |
-          echo "=== COMMIT ==="
-          git rev-parse HEAD
+          python - <<'PY'
+          from pathlib import Path
+          import joblib
 
-          echo "=== WORKING DIRECTORY ==="
-          pwd
+          model_path = Path("models/best_model.joblib")
 
-          echo "=== REPOSITORY ROOT ==="
-          ls -la
+          print("Model path:", model_path.resolve())
+          print("Exists:", model_path.exists())
+          print("Size:", model_path.stat().st_size)
 
-          echo "=== MODELS DIRECTORY ==="
-          if [ -d models ]; then
-            ls -lah models
-          else
-            echo "ERROR: models directory does not exist"
-            exit 1
-          fi
+          model = joblib.load(model_path)
 
-          echo "=== GIT TRACKED MODEL ==="
-          git ls-files -s models/best_model.joblib
-
-          echo "=== MODEL FILE CHECK ==="
-          if [ -f models/best_model.joblib ]; then
-            echo "MODEL EXISTS"
-            ls -lh models/best_model.joblib
-          else
-            echo "ERROR: MODEL DOES NOT EXIST"
-            exit 1
-          fi
+          print("Model loaded successfully")
+          print("Model type:", type(model))
+          PY
 
       - name: Run tests
+        shell: bash
         run: |
           pytest -v
 
@@ -69,6 +88,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify model before Docker build
+        shell: bash
+        run: |
+          set -eux
+
+          git rev-parse HEAD
+          git ls-tree -l HEAD models/best_model.joblib
+          ls -lah models/best_model.joblib
+          test -f models/best_model.joblib
+          test -s models/best_model.joblib
 
       - name: Build Docker image
         run: |
