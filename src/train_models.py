@@ -1,3 +1,5 @@
+import os
+import joblib
 import mlflow
 import mlflow.sklearn
 import pandas as pd
@@ -174,6 +176,27 @@ def evaluate_model(
                 "xgboost.core.Booster",
                 "xgboost.sklearn.XGBClassifier",
             ]
+        )
+                # Save model locally
+        os.makedirs("models", exist_ok=True)
+
+        model_filename = (
+            model_name.replace("-", "_")
+            + ".joblib"
+        )
+
+        model_path = os.path.join(
+            "models",
+            model_filename
+        )
+
+        joblib.dump(
+            pipeline,
+            model_path
+        )
+
+        print(
+            f"Model saved to: {model_path}"
         )
 
         print(
