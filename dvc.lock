@@ -24,3 +24,71 @@ stages:
       hash: md5
       md5: b49906d697850973cdb52e7946a5b698
       size: 133629
+  train:
+    cmd: python src/train_models.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 64852f901beb48a7bd645314f6a48b7b
+      size: 625023
+    - path: data/processed/validation.csv
+      hash: md5
+      md5: b49906d697850973cdb52e7946a5b698
+      size: 133629
+    - path: src/train_models.py
+      hash: md5
+      md5: ba1c25d193dc43ba762f464b3f434fab
+      size: 6913
+    outs:
+    - path: models/gradient_boosting.joblib
+      hash: md5
+      md5: e89b3276732025a4a512df049e698473
+      size: 214372
+    - path: models/logistic_regression.joblib
+      hash: md5
+      md5: a4c6f3a0e39cfaecab36ef5d8db6ed44
+      size: 7537
+    - path: models/random_forest.joblib
+      hash: md5
+      md5: 0182bc6ecd2093863d9234afc92e0a0c
+      size: 11970434
+    - path: models/xgboost.joblib
+      hash: md5
+      md5: b703cb854a72392d5c05e5e9271f485e
+      size: 447814
+    - path: reports/model_comparison.csv
+      hash: md5
+      md5: 840cbb6512d8f0a618bdcddab6878322
+      size: 487
+  select_best_model:
+    cmd: python src/select_best_model.py
+    deps:
+    - path: models/gradient_boosting.joblib
+      hash: md5
+      md5: e89b3276732025a4a512df049e698473
+      size: 214372
+    - path: models/logistic_regression.joblib
+      hash: md5
+      md5: a4c6f3a0e39cfaecab36ef5d8db6ed44
+      size: 7537
+    - path: models/random_forest.joblib
+      hash: md5
+      md5: 0182bc6ecd2093863d9234afc92e0a0c
+      size: 11970434
+    - path: models/xgboost.joblib
+      hash: md5
+      md5: b703cb854a72392d5c05e5e9271f485e
+      size: 447814
+    - path: reports/model_comparison.csv
+      hash: md5
+      md5: 840cbb6512d8f0a618bdcddab6878322
+      size: 487
+    - path: src/select_best_model.py
+      hash: md5
+      md5: 7da683338f6559b79d6fb60e2a56eaab
+      size: 1684
+    outs:
+    - path: models/best_model.joblib
+      hash: md5
+      md5: a4c6f3a0e39cfaecab36ef5d8db6ed44
+      size: 7537
