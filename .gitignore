@@ -25,3 +25,9 @@ data/processed/
 # OS
 .DS_Store
 Thumbs.db
+
+# Virtual environment
+mlops/
+
+# MLflow database
+mlflow.db
